@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -48,7 +49,7 @@ func scanFilesForXMP(dir string) {
 		}
 		defer file.Close()
 
-		xmpData, err := xmp.Scan(file)
+		doc, err := xmp.Scan(file)
 		if err != nil {
 			if err.Error() == "xmp: no XMP found" {
 				fmt.Printf("%s: No XMP metadata found\n", path)
@@ -60,7 +61,12 @@ func scanFilesForXMP(dir string) {
 
 		fmt.Printf("%s: XMP metadata found\n", path)
 		fmt.Println("XMP Data:")
-		fmt.Printf("%+v\n", xmpData)
+		jsonData, err := json.MarshalIndent(doc, "", "  ")
+		if err != nil {
+			slog.Error("Error marshalling XMP data to JSON", "path", path, "error", err)
+			return nil
+		}
+		fmt.Println(string(jsonData))
 
 		return nil
 	})
