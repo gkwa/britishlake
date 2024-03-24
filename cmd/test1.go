@@ -42,6 +42,10 @@ func scanFilesForXMP(dir string) {
 			return nil
 		}
 
+		if !info.Mode().IsRegular() {
+			return nil
+		}
+
 		file, err := os.Open(path)
 		if err != nil {
 			slog.Error("Error opening file", "path", path, "error", err)
